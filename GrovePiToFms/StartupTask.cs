@@ -68,7 +68,7 @@ namespace GrovePiToFms
             leds = DeviceFactory.Build.BuildLedBar(Pin.DigitalPin8);
 
             // start the timer
-            ThreadPoolTimer timer = ThreadPoolTimer.CreatePeriodicTimer(Timer_Tick, TimeSpan.FromSeconds(240));
+            ThreadPoolTimer timer = ThreadPoolTimer.CreatePeriodicTimer(Timer_Tick, TimeSpan.FromSeconds(1));
         }
 
         private async void Timer_Tick(ThreadPoolTimer timer)
@@ -152,7 +152,9 @@ namespace GrovePiToFms
                     Thread.Sleep(TimeSpan.FromMilliseconds(250));
 
                 }
-                await fmserver.Logout();
+                // no longer logging out after each call
+                // await fmserver.Logout();
+                // token = string.empty;
             }
             // clear the display again
             leds.SetLevel((byte)1);
