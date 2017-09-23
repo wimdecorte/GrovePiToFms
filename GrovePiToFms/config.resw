@@ -122,7 +122,7 @@
     <comment>24h format time</comment>
   </data>
   <data name="fm_account" xml:space="preserve">
-    <value>rpi</value>
+    <value>grove</value>
   </data>
   <data name="fm_file" xml:space="preserve">
     <value>SenseHat</value>
@@ -131,7 +131,7 @@
     <value>GrovePi</value>
   </data>
   <data name="fm_pw" xml:space="preserve">
-    <value>rpi</value>
+    <value>grove</value>
   </data>
   <data name="fm_server_address" xml:space="preserve">
     <value>wimjm.fmi-beta.filemaker-cloud.com</value>

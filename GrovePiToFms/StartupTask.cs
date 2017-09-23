@@ -46,6 +46,20 @@ namespace GrovePiToFms
             // set the security for fms, and hook into fms
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
+            fmserver = GetFMSInstance();
+
+            // get the sensors
+            lightSensor = DeviceFactory.Build.LightSensor(Pin.AnalogPin0);
+            soundSensor = DeviceFactory.Build.SoundSensor(Pin.AnalogPin2);
+            leds = DeviceFactory.Build.BuildLedBar(Pin.DigitalPin8);
+            leds.Initialize(GrovePi.Sensors.Orientation.GreenToRed);
+
+            // start the timer
+            ThreadPoolTimer timer = ThreadPoolTimer.CreatePeriodicTimer(Timer_Tick, TimeSpan.FromSeconds(1));
+        }
+
+        private FMS GetFMSInstance()
+        {
             // hook into FMS from settings in the config file
             var resources = new ResourceLoader("config");
             var fm_server_address = resources.GetString("fm_server_address");
@@ -58,17 +72,11 @@ namespace GrovePiToFms
 
             // calculate the current day's start and end time
 
-            fmserver = new FMS(fm_server_address, fm_account, fm_pw);
-            fmserver.SetFile(fm_file);
-            fmserver.SetLayout(fm_layout);
+            FMS fms = new FMS(fm_server_address, fm_account, fm_pw);
+            fms.SetFile(fm_file);
+            fms.SetLayout(fm_layout);
 
-            // get the sensors
-            lightSensor = DeviceFactory.Build.LightSensor(Pin.AnalogPin0);
-            soundSensor = DeviceFactory.Build.SoundSensor(Pin.AnalogPin2);
-            leds = DeviceFactory.Build.BuildLedBar(Pin.DigitalPin8);
-
-            // start the timer
-            ThreadPoolTimer timer = ThreadPoolTimer.CreatePeriodicTimer(Timer_Tick, TimeSpan.FromSeconds(1));
+            return fms;
         }
 
         private async void Timer_Tick(ThreadPoolTimer timer)
@@ -116,8 +124,9 @@ namespace GrovePiToFms
             }
             else if (DateTime.Now > tokenRecieved.AddMinutes(12))
             {
-                await fmserver.Logout();
+                int logoutResponse = await fmserver.Logout();
                 token = string.Empty;
+                fmserver = GetFMSInstance();
                 token = await fmserver.Authenticate();
                 tokenRecieved = DateTime.Now;
             }
