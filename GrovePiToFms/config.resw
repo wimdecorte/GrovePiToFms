@@ -134,7 +134,7 @@
     <value>grove</value>
   </data>
   <data name="fm_server_address" xml:space="preserve">
-    <value>wimjm.fmi-beta.filemaker-cloud.com</value>
+    <value>landmammal.soliant.cloud</value>
     <comment>DNS name since FMS REST Api requires an HTTPS connection</comment>
   </data>
   <data name="light_level" xml:space="preserve">

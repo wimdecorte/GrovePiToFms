@@ -20,7 +20,7 @@ namespace GrovePiToFms
 
         BackgroundTaskDeferral _deferral;
 
-        FMS fmserver;
+        FMS17 fmserver;
         DateTime tokenRecieved;
         string token;
 
@@ -58,7 +58,7 @@ namespace GrovePiToFms
             ThreadPoolTimer timer = ThreadPoolTimer.CreatePeriodicTimer(Timer_Tick, TimeSpan.FromSeconds(1));
         }
 
-        private FMS GetFMSInstance()
+        private FMS17 GetFMSInstance()
         {
             // hook into FMS from settings in the config file
             var resources = new ResourceLoader("config");
@@ -72,7 +72,7 @@ namespace GrovePiToFms
 
             // calculate the current day's start and end time
 
-            FMS fms = new FMS(fm_server_address, fm_account, fm_pw);
+            FMS17 fms = new FMS17(fm_server_address, fm_account, fm_pw);
             fms.SetFile(fm_file);
             fms.SetLayout(fm_layout);
 
@@ -153,14 +153,19 @@ namespace GrovePiToFms
                 request.AddField("light_error", lightError);
                 request.AddField("when", DateTime.Now.ToString());
 
+                // add a script call to calculate the time diff to the previous record
+                request.AddScript(ScriptTypes.after, "calculate_gap_grove");
 
                 var response = await request.Execute();
-                if (response.errorCode != 0)
+                if (fmserver.lastErrorCode != 0)
+                {
+                    leds.SetLevel((byte)2);
+                }
+                else
                 {
                     leds.SetLevel((byte)10);
-                    Thread.Sleep(TimeSpan.FromMilliseconds(250));
-
                 }
+                Thread.Sleep(TimeSpan.FromMilliseconds(250));
                 // no longer logging out after each call
                 // await fmserver.Logout();
                 // token = string.empty;
